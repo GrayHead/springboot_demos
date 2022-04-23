@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,19 +13,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ua.com.owu.springboot_demos.dao.CustomerDAO;
-import ua.com.owu.springboot_demos.dao.services.CustomerService;
 import ua.com.owu.springboot_demos.models.entity.Customer;
 import ua.com.owu.springboot_demos.security.filters.CustomFilter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +35,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     public CustomFilter customFilter() {
-        return new CustomFilter();
+
+        CustomFilter customFilter = new CustomFilter(customerDAO);
+
+        return customFilter;
     }
 
     @Override
@@ -66,10 +66,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http = http.authorizeHttpRequests()
                 .antMatchers(HttpMethod.GET, "/", "/open").permitAll()
                 .antMatchers(HttpMethod.POST, "/save").permitAll()
+                .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .antMatchers(HttpMethod.GET, "/secure").hasAnyRole("ADMIN", "USER")
                 .and();
 
-        http = http.httpBasic().and();
 
         http = http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
 
@@ -94,5 +94,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return source;
     }
 
-
+    @Override
+    @Bean
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
 }
