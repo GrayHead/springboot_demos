@@ -10,6 +10,7 @@ import ua.com.owu.springboot_demos.models.Customer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/customers")
@@ -17,7 +18,6 @@ import java.util.List;
 public class MainController {
 
     private CustomerDAO customerDAO;
-
 
     @GetMapping("")
     public ResponseEntity<List<Customer>> getCustomers() {
@@ -27,9 +27,9 @@ public class MainController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getCustomer(@PathVariable int id) {
-        return new ResponseEntity<>(customerDAO.findOne(id), HttpStatus.OK);
+        Optional<Customer> byId = customerDAO.findById(id);
+        return new ResponseEntity<>(byId.get(), HttpStatus.OK);
     }
-
 
     @PostMapping("")
     public void saveCustomerJSONBody(@RequestBody Customer customer) {
@@ -39,15 +39,24 @@ public class MainController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<List<Customer>> deleteCustomer(@PathVariable int id) {
-        customerDAO.delete(id);
-
+        customerDAO.deleteById(id);
         return new ResponseEntity<>(customerDAO.findAll(), HttpStatus.OK);
     }
 
     @PatchMapping("")
     public ResponseEntity<List<Customer>> updateCustomer(@RequestBody Customer customer) {
-        customerDAO.update(customer);
+        customerDAO.save(customer);
         return new ResponseEntity<>(customerDAO.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/findby/name/{name}")
+    public List<Customer> findByNameQuery(@PathVariable String name) {
+        return customerDAO.byName(name);
+    }
+
+    @GetMapping("/findby/name/method/{name}")
+    public List<Customer> findByNameMethod(@PathVariable String name) {
+        return customerDAO.findByName(name);
     }
 
 

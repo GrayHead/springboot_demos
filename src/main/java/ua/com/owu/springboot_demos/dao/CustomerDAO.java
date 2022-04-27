@@ -1,44 +1,19 @@
 package ua.com.owu.springboot_demos.dao;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ua.com.owu.springboot_demos.models.Customer;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
 import java.util.List;
 
-@Repository
-@Transactional
-public class CustomerDAO {
+public interface CustomerDAO extends JpaRepository<Customer, Integer> {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Query("select c from Customer c where c.name=:name")
+    List<Customer> byName(@Param("name") String xxx);
 
-
-    public void save(Customer customer) {
-        entityManager.persist(customer);
-
-    }
-
-
-    public void update(Customer customer) {
-        entityManager.merge(customer);
-    }
-
-    public List<Customer> findAll() {
-//        return entityManager.createNativeQuery("select * from customer", Customer.class).getResultList();
-        return entityManager.createQuery("select c from Customer c", Customer.class).getResultList();
-
-    }
-
-    public Customer findOne(int id) {
-        return entityManager.find(Customer.class, id);
-    }
-
-    public void delete(int id) {
-        entityManager.remove(findOne(id));
-    }
-
+    List<Customer> findByName(String name);
 
 }
+
+//https://docs.spring.io/spring-data/jpa/docs/1.5.0.RELEASE/reference/html/jpa.repositories.html
