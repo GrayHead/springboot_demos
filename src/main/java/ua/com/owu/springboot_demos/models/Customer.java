@@ -6,17 +6,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 
 @Getter
 @Setter
 @Entity
-//@Table(name = "customer_table")
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    //    @Column(name = "customer_name", unique = true, nullable = false)
+
+    @NotBlank(message = "name is required")
+    @Size(min = 2, message = "name must be at least 2 characters")
+    @Size(max = 255, message = "name must 255 chars max")
     private String name;
 
     public Customer() {

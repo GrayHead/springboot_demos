@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.com.owu.springboot_demos.dao.CustomerDAO;
 import ua.com.owu.springboot_demos.models.Customer;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public class MainController {
     }
 
     @PostMapping("")
-    public void saveCustomerJSONBody(@RequestBody Customer customer) {
+    public void saveCustomerJSONBody(@RequestBody @Valid Customer customer) {
         customerDAO.save(customer);
 
     }
