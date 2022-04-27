@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.com.owu.springboot_demos.dao.CustomerDAO;
 import ua.com.owu.springboot_demos.models.Customer;
 import ua.com.owu.springboot_demos.models.dto.CustomerDTO;
+import ua.com.owu.springboot_demos.services.CustomerService;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -20,50 +21,44 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class CustomerController {
 
-    private CustomerDAO customerDAO;
+    private CustomerService customerService;
 
     @GetMapping("")
     public ResponseEntity<List<CustomerDTO>> getCustomers() {
-        List<Customer> all = customerDAO.findAll();
-        List<CustomerDTO> collect = all.stream().map(customer -> new CustomerDTO(customer.getName(), customer.getAge())).collect(Collectors.toList());
-        return new ResponseEntity<>(collect, HttpStatus.OK);
+        return new ResponseEntity<>(customerService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomer(@PathVariable int id) {
-        Optional<Customer> byId = customerDAO.findById(id);
-        return new ResponseEntity<>(byId.get(), HttpStatus.OK);
+    public ResponseEntity<CustomerDTO> getCustomer(@PathVariable int id) {
+        return new ResponseEntity<>(customerService.findOneById(id), HttpStatus.OK);
     }
 
     @PostMapping("")
     public void saveCustomerJSONBody(@RequestBody @Valid CustomerDTO customerDTO) {
-        Customer customer = new Customer();
-        customer.setName(customerDTO.getCustomerName());
-        customer.setAge(customerDTO.getCustomerAge());
-        customerDAO.save(customer);
+        customerService.save(customerDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<List<Customer>> deleteCustomer(@PathVariable int id) {
-        customerDAO.deleteById(id);
-        return new ResponseEntity<>(customerDAO.findAll(), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteCustomer(@PathVariable int id) {
+        customerService.delete(id);
+
     }
 
     @PatchMapping("")
-    public ResponseEntity<List<Customer>> updateCustomer(@RequestBody Customer customer) {
-        customerDAO.save(customer);
-        return new ResponseEntity<>(customerDAO.findAll(), HttpStatus.OK);
+    public ResponseEntity<CustomerDTO> updateCustomer(@RequestBody CustomerDTO dto) {
+        return new ResponseEntity<>(customerService.update(dto), HttpStatus.OK);
     }
 
-    @GetMapping("/findby/name/{name}")
-    public List<Customer> findByNameQuery(@PathVariable String name) {
-        return customerDAO.byName(name);
-    }
-
-    @GetMapping("/findby/name/method/{name}")
-    public List<Customer> findByNameMethod(@PathVariable String name) {
-        return customerDAO.findByName(name);
-    }
+//    @GetMapping("/findby/name/{name}")
+//    public List<Customer> findByNameQuery(@PathVariable String name) {
+//        return customerDAO.byName(name);
+//    }
+//
+//    @GetMapping("/findby/name/method/{name}")
+//    public List<Customer> findByNameMethod(@PathVariable String name) {
+//        return customerDAO.findByName(name);
+//    }
 
 
 }
