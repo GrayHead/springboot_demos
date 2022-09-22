@@ -2,21 +2,38 @@ package ua.com.owu.springboot_demos.controllers;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ua.com.owu.springboot_demos.dao.ClientDAO;
+import ua.com.owu.springboot_demos.models.Client;
 
 @RestController
+@AllArgsConstructor
 public class MainController {
+    private PasswordEncoder passwordEncoder;
+    private ClientDAO clientDAO;
 
     @PostMapping("/token")
     public String createToken(@RequestParam String username, @RequestParam String password) {
+        //Стоірили токен
         String jwtoken = Jwts.builder()
                 .setSubject(username)
                 .signWith(SignatureAlgorithm.HS512, password.getBytes())
                 .compact();
-        System.out.println(jwtoken);
-        return jwtoken; // токен містть дані про юзернейм закодований паролем. Отримати нейм можливо тільки знаючи пароль
+
+        Client client = Client.builder()
+                .username(username)
+                // захешували пароль
+                .password(passwordEncoder.encode(password))
+                .token(jwtoken)
+                .build();
+        //Збергли об'єкт в якому є токен,
+        // котрий містить нейм та розшифровується за допомоши паролю
+        clientDAO.save(client);
+        return jwtoken;
     }
 
 
