@@ -3,6 +3,10 @@ package ua.com.owu.springboot_demos.controllers;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ua.com.owu.springboot_demos.dao.ClientDAO;
 import ua.com.owu.springboot_demos.models.Client;
+
+import java.util.Collections;
 
 @RestController
 @AllArgsConstructor
@@ -45,6 +51,8 @@ public class MainController {
 
     @GetMapping("/secure")
     public String secure () {
+//        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("vasya", "okten", Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))));
+
             return "secure data";
     }
 
