@@ -38,8 +38,8 @@ public class MainController {
     }
 
 //    тестовий захищений метод
-    @GetMapping("/test")
-    public String test() {
+    @GetMapping("/testCheck")
+    public String testCheck() {
         return "test";
     }
 
