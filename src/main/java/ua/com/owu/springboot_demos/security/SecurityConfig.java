@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,6 +34,11 @@ public class SecurityConfig {
     private ClientDAO clientDAO;
 
     @Bean
+    public OncePerRequestCustomFilter oncePerRequestCustomFilter() {
+        return new OncePerRequestCustomFilter(clientDAO);
+    }
+
+    @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -42,12 +49,14 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .antMatchers(HttpMethod.POST, "/token").permitAll()
-                .antMatchers(HttpMethod.GET,"/test").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/test").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/secure").authenticated()
                 .anyRequest().authenticated()
                 .and()
-                .httpBasic()
+.httpBasic() .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .addFilterBefore(oncePerRequestCustomFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -66,6 +75,12 @@ public class SecurityConfig {
             );
         };
     }
+
+//    @Bean
+//    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+//            throws Exception {
+//        return authenticationConfiguration.getAuthenticationManager();
+//    }
 
 
 }
