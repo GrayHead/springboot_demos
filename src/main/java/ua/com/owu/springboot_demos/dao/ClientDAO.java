@@ -6,4 +6,6 @@ import ua.com.owu.springboot_demos.models.Client;
 
 public interface ClientDAO extends JpaRepository<Client, Integer> {
 
+    Client findByUsername(String username);
+
 }

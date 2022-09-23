@@ -1,24 +1,35 @@
 package ua.com.owu.springboot_demos.security;
 
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ua.com.owu.springboot_demos.dao.ClientDAO;
+import ua.com.owu.springboot_demos.models.Client;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
+@AllArgsConstructor
 public class SecurityConfig {
+    private ClientDAO clientDAO;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -31,10 +42,29 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .antMatchers(HttpMethod.POST, "/token").permitAll()
+                .antMatchers(HttpMethod.GET,"/test").hasRole("USER")
                 .anyRequest().authenticated()
+                .and()
+                .httpBasic()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         return http.build();
+    }
+
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        System.out.println("userDetailsService");
+        return username -> {
+            System.out.println(username);
+            Client client = clientDAO.findByUsername(username);
+
+            return new User(
+                    client.getUsername(),
+                    client.getPassword(),
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+            );
+        };
     }
 
 

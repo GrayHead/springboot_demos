@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +35,12 @@ public class MainController {
         // котрий містить нейм та розшифровується за допомоши паролю
         clientDAO.save(client);
         return jwtoken;
+    }
+
+//    тестовий захищений метод
+    @GetMapping("/test")
+    public String test() {
+        return "test";
     }
 
 
