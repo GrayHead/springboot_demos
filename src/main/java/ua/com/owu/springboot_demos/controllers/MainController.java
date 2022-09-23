@@ -22,7 +22,7 @@ public class MainController {
         //Стоірили токен
         String jwtoken = Jwts.builder()
                 .setSubject(username)
-                .signWith(SignatureAlgorithm.HS512, password.getBytes())
+                .signWith(SignatureAlgorithm.HS512, "okten".getBytes())
                 .compact();
 
         Client client = Client.builder()
@@ -37,10 +37,15 @@ public class MainController {
         return jwtoken;
     }
 
-//    тестовий захищений метод
+    //    тестовий захищений метод
     @GetMapping("/testCheck")
     public String testCheck() {
         return "test";
+    }
+
+    @GetMapping("/secure")
+    public String secure () {
+            return "secure data";
     }
 
 
